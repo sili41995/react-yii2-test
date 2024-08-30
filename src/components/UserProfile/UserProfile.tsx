@@ -1,60 +1,26 @@
 import { ChangeEvent, FC, useRef, useState } from 'react';
 import { SlPhone, SlEvent, SlLocationPin } from 'react-icons/sl';
 import { SubmitHandler } from 'react-hook-form';
-import { IconSizes, Messages } from '@/constants';
+import { IconSizes } from '@/constants';
 import { IAvatar } from '@/types/types';
-import { getProfileFormData, onChangeAvatar, toasts } from '@/utils';
 import ImageContainer from '@/components/ImageContainer';
-import { useAppDispatch } from '@/hooks/redux';
-import { updateUserAvatar } from '@/redux/auth/operations';
 import { IProps } from './UserProfile.types';
-import {
-  InfoList,
-  Email,
-  FullName,
-  Name,
-  InfoItem,
-  UserData,
-  ContactInfoIconWrap,
-  Container,
-} from './UserProfile.styled';
+import { InfoList, Email, FullName, Name, InfoItem, UserData, ContactInfoIconWrap, Container } from './UserProfile.styled';
 
 const UserProfile: FC<IProps> = ({ user }) => {
   const [userAvatar, setUserAvatar] = useState<FileList | null>(null);
   const userAvatarRef = useRef<HTMLImageElement>(null);
-  const dispatch = useAppDispatch();
 
   const { name, avatar, email, phone, location, lastName, dateOfBirth } = user;
   const fullName = lastName ? `${name} ${lastName}` : name;
-  const userDateOfBirth =
-    dateOfBirth && new Date(dateOfBirth).toLocaleDateString();
+  const userDateOfBirth = dateOfBirth && new Date(dateOfBirth).toLocaleDateString();
 
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length) {
-      return;
-    }
-
-    setUserAvatar(e.target.files);
-    onChangeAvatar({ e, ref: userAvatarRef });
+    console.log(e);
   };
 
   const handleFormSubmit: SubmitHandler<IAvatar> = (data) => {
-    if (!userAvatar?.length) {
-      return;
-    }
-
-    data.avatar = userAvatar;
-    const userFormData = getProfileFormData(data);
-
-    dispatch(updateUserAvatar(userFormData))
-      .unwrap()
-      .then(() => {
-        toasts.successToast(Messages.updateAvatar);
-        setUserAvatar(null);
-      })
-      .catch((error) => {
-        toasts.errorToast(error);
-      });
+    console.log(data);
   };
 
   const onCancelBtnClick = () => {
@@ -75,7 +41,7 @@ const UserProfile: FC<IProps> = ({ user }) => {
           handleFormSubmit={handleFormSubmit}
           onChangeInput={onChangeInput}
           onCancelBtnClick={onCancelBtnClick}
-          imgSize="150"
+          imgSize='150'
         />
         <FullName>{fullName}</FullName>
         <Email>{email}</Email>

@@ -1,11 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  AiFillStar,
-  AiOutlineDelete,
-  AiOutlineEdit,
-  AiOutlineStar,
-} from 'react-icons/ai';
+import { AiFillStar, AiOutlineDelete, AiOutlineEdit, AiOutlineStar } from 'react-icons/ai';
 import DefaultMessage from '@/components/DefaultMessage';
 import ContactProfile from '@/components/ContactProfile';
 import GoBackLink from '@/components/GoBackLink';
@@ -13,33 +8,15 @@ import IconButton from '@/components/IconButton';
 import { AriaLabels, IconBtnType, IconSizes, PagePaths } from '@/constants';
 import { BtnClickEvt } from '@/types/types';
 import { makeBlur } from '@/utils';
-import { useAppSelector } from '@/hooks/redux';
 import { useDeleteContact } from '@/hooks';
-import { selectIsLoading } from '@/redux/contacts/selectors';
-import {
-  ButtonsContainer,
-  Container,
-  ButtonsList,
-  Item,
-} from './ContactDetails.styled';
+import { ButtonsContainer, Container, ButtonsList, Item } from './ContactDetails.styled';
 import { IProps } from './ContactDetails.types';
 
-const ContactDetails: FC<IProps> = ({
-  contact,
-  updateContact,
-  onFavoriteBtnClick,
-  isFetchError,
-  isLoaded,
-}) => {
+const ContactDetails: FC<IProps> = ({ contact, updateContact, onFavoriteBtnClick, isFetchError, isLoaded }) => {
   const deleteContact = useDeleteContact();
   const [editContact, setEditContact] = useState<boolean>(false);
   const id = useParams()[PagePaths.dynamicParam];
-  const isLoading = useAppSelector(selectIsLoading);
-  const favoriteBtnIcon = contact?.favorite ? (
-    <AiFillStar size={IconSizes.primaryIconSize} />
-  ) : (
-    <AiOutlineStar size={IconSizes.primaryIconSize} />
-  );
+  const favoriteBtnIcon = contact?.favorite ? <AiFillStar size={IconSizes.primaryIconSize} /> : <AiOutlineStar size={IconSizes.primaryIconSize} />;
   const isLoadedContact = isLoaded && contact;
 
   useEffect(() => {
@@ -66,44 +43,20 @@ const ContactDetails: FC<IProps> = ({
             {!editContact && (
               <>
                 <Item>
-                  <IconButton
-                    disabled={isLoading}
-                    btnType={IconBtnType.favorite}
-                    aria-label={AriaLabels.favorite}
-                    onBtnClick={onFavoriteBtnClick}
-                    icon={favoriteBtnIcon}
-                  />
+                  <IconButton btnType={IconBtnType.favorite} aria-label={AriaLabels.favorite} onBtnClick={onFavoriteBtnClick} icon={favoriteBtnIcon} />
                 </Item>
                 <Item>
-                  <IconButton
-                    disabled={isLoading}
-                    btnType={IconBtnType.delete}
-                    aria-label={AriaLabels.delete}
-                    onBtnClick={onDelBtnClick}
-                    icon={<AiOutlineDelete size={IconSizes.primaryIconSize} />}
-                  />
+                  <IconButton btnType={IconBtnType.delete} aria-label={AriaLabels.delete} onBtnClick={onDelBtnClick} icon={<AiOutlineDelete size={IconSizes.primaryIconSize} />} />
                 </Item>
               </>
             )}
             <Item>
-              <IconButton
-                btnType={IconBtnType.edit}
-                aria-label={AriaLabels.edit}
-                onBtnClick={onEditBtnClick}
-                icon={<AiOutlineEdit size={IconSizes.primaryIconSize} />}
-              />
+              <IconButton btnType={IconBtnType.edit} aria-label={AriaLabels.edit} onBtnClick={onEditBtnClick} icon={<AiOutlineEdit size={IconSizes.primaryIconSize} />} />
             </Item>
           </ButtonsList>
         )}
       </ButtonsContainer>
-      {isLoadedContact && (
-        <ContactProfile
-          contact={contact}
-          editContact={editContact}
-          onEditBtnClick={onEditBtnClick}
-          setContact={updateContact}
-        />
-      )}
+      {isLoadedContact && <ContactProfile contact={contact} editContact={editContact} onEditBtnClick={onEditBtnClick} setContact={updateContact} />}
       {isFetchError && <DefaultMessage message='Contact is absent' />}
     </Container>
   );

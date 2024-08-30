@@ -2,20 +2,13 @@ import { useMemo, FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IProps } from './ContactsContainer.types';
 import { SearchParamsKeys } from '@/constants';
-import { useAppSelector } from '@/hooks/redux';
-import { selectContacts } from '@/redux/contacts/selectors';
-import {
-  filterContactsByName,
-  getVisibleContacts,
-  sortContactsByName,
-} from '@/utils';
+import { filterContactsByName, getVisibleContacts, sortContactsByName } from '@/utils';
 import ContactsList from '@/components/ContactsList';
 import PaginationBar from '@/components/PaginationBar';
 import DefaultMessage from '@/components/DefaultMessage';
 import { Container } from './ContactsContainer.styled';
 
 const ContactsContainer: FC<IProps> = ({ quantity }) => {
-  const contacts = useAppSelector(selectContacts);
   const [searchParams] = useSearchParams();
   const filter = searchParams.get(SearchParamsKeys.filter) ?? '';
   const sortType = searchParams.get(SearchParamsKeys.sort) ?? '';
@@ -23,9 +16,9 @@ const ContactsContainer: FC<IProps> = ({ quantity }) => {
   const isValidPage = currentPage > 0;
 
   const filteredContacts = useMemo(() => {
-    const sortedContacts = sortContactsByName(contacts, sortType);
+    const sortedContacts = sortContactsByName([], sortType);
     return filterContactsByName(sortedContacts, filter);
-  }, [contacts, filter, sortType]);
+  }, [filter, sortType]);
 
   const visibleContacts = getVisibleContacts({
     filteredContacts,
@@ -41,13 +34,7 @@ const ContactsContainer: FC<IProps> = ({ quantity }) => {
       {isShouldRenderList ? (
         <>
           <ContactsList contacts={renderContacts} />
-          {!filter && (
-            <PaginationBar
-              quantity={quantity}
-              step={2}
-              itemsQuantity={filteredContacts.length}
-            />
-          )}
+          {!filter && <PaginationBar quantity={quantity} step={2} itemsQuantity={filteredContacts.length} />}
         </>
       ) : (
         <DefaultMessage message='Contact list is empty' />

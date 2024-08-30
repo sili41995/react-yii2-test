@@ -5,27 +5,14 @@ import { toasts } from '@/utils';
 import AuthFormMessage from '@/components/AuthFormMessage';
 import Input from '@/components/Input';
 import AuthFormBtn from '@/components/AuthFormBtn';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { signInUser } from '@/redux/auth/operations';
-import { selectIsLoading, selectUser } from '@/redux/auth/selectors';
 import { ICredentials } from '@/types/types';
-import {
-  Messages,
-  FormTypes,
-  IconBtnType,
-  IconSizes,
-  InputTypes,
-  PagePaths,
-} from '@/constants';
+import { Messages, FormTypes, IconBtnType, IconSizes, InputTypes, PagePaths } from '@/constants';
 import defaultAvatar from '@/images/default-signin-avatar.png';
 import { Form, Message, Title, Image } from './SignInForm.styled';
 
 const SignInForm = () => {
-  const user = useAppSelector(selectUser);
   const [credentials, setCredentials] = useState<ICredentials | null>(null);
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
-  const dispatch = useAppDispatch();
-  const isLoading = useAppSelector(selectIsLoading);
 
   const {
     register,
@@ -33,21 +20,10 @@ const SignInForm = () => {
     handleSubmit,
     watch,
   } = useForm<ICredentials>();
-  const passwordInputType = isShowPassword
-    ? InputTypes.text
-    : InputTypes.password;
+  const passwordInputType = isShowPassword ? InputTypes.text : InputTypes.password;
   const watchPassword = watch('password');
-  const passwordBtnIcon =
-    Boolean(watchPassword) &&
-    (isShowPassword ? (
-      <FaEyeSlash size={IconSizes.secondaryIconSize} />
-    ) : (
-      <FaEye size={IconSizes.secondaryIconSize} />
-    ));
+  const passwordBtnIcon = Boolean(watchPassword) && (isShowPassword ? <FaEyeSlash size={IconSizes.secondaryIconSize} /> : <FaEye size={IconSizes.secondaryIconSize} />);
   const signUpPageLink = `/${PagePaths.signUp}`;
-  const greetings = `${Messages.greetings}${
-    user.name ? `, ${user.name}` : ''
-  }!`;
 
   const toggleIsShowPassword = () => {
     setIsShowPassword((prevState) => !prevState);
@@ -55,35 +31,13 @@ const SignInForm = () => {
 
   useEffect(() => {
     if (credentials) {
-      const promise = dispatch(signInUser(credentials));
-      promise
-        .unwrap()
-        .then(() => {
-          toasts.successToast('Hello, my friend!');
-        })
-        .catch((error) => {
-          toasts.errorToast(error);
-        });
-
-      return () => {
-        promise.abort();
-      };
+      console.log(credentials);
     }
-  }, [credentials, dispatch]);
+  }, [credentials]);
 
   useEffect(() => {
-    errors.email &&
-      toasts.errorToast(
-        errors.email.type === 'required'
-          ? Messages.emailReqErr
-          : Messages.emailRegExpErr
-      );
-    errors.password &&
-      toasts.errorToast(
-        errors.password.type === 'required'
-          ? Messages.passwordReqErr
-          : Messages.passwordMinLengthErr
-      );
+    errors.email && toasts.errorToast(errors.email.type === 'required' ? Messages.emailReqErr : Messages.emailRegExpErr);
+    errors.password && toasts.errorToast(errors.password.type === 'required' ? Messages.passwordReqErr : Messages.passwordMinLengthErr);
   }, [isSubmitting, errors]);
 
   const onSubmit: SubmitHandler<ICredentials> = (data) => {
@@ -93,13 +47,8 @@ const SignInForm = () => {
   return (
     <>
       <Title>sign in</Title>
-      <Message>{greetings}</Message>
-      <Image
-        src={user.avatar ?? defaultAvatar}
-        alt='user avatar'
-        width='150'
-        height='150'
-      />
+      <Message>greetings</Message>
+      <Image src={defaultAvatar} alt='user avatar' width='150' height='150' />
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           settings={{ ...register('email', { required: true }) }}
@@ -123,12 +72,8 @@ const SignInForm = () => {
           btnIcon={passwordBtnIcon}
           action={toggleIsShowPassword}
         />
-        <AuthFormMessage
-          action='Sign up'
-          pageLink={signUpPageLink}
-          message="if you don't have an account yet"
-        />
-        <AuthFormBtn title='Sign in' disabled={isLoading} />
+        <AuthFormMessage action='Sign up' pageLink={signUpPageLink} message="if you don't have an account yet" />
+        <AuthFormBtn title='Sign in' />
       </Form>
     </>
   );

@@ -1,42 +1,17 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import {
-  FaUser,
-  FaLock,
-  FaMapMarkerAlt,
-  FaRegCalendarCheck,
-  FaPhoneAlt,
-  FaEnvelope,
-} from 'react-icons/fa';
-import {
-  filterEmptyFields,
-  getProfileFormData,
-  onChangeAvatar,
-  toasts,
-} from '@/utils';
+import { FaUser, FaLock, FaMapMarkerAlt, FaRegCalendarCheck, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
+import { onChangeAvatar, toasts } from '@/utils';
 import Input from '@/components/Input';
 import AuthFormBtn from '@/components/AuthFormBtn';
 import AuthFormMessage from '@/components/AuthFormMessage';
-import { signUpUser } from '@/redux/auth/operations';
-import { selectIsLoading } from '@/redux/auth/selectors';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { ISignUpCredentials } from '@/types/types';
-import {
-  PagePaths,
-  regExp,
-  FormTypes,
-  IconSizes,
-  InputTypes,
-  Messages,
-} from '@/constants';
+import { PagePaths, regExp, FormTypes, IconSizes, InputTypes, Messages } from '@/constants';
 import image from '@/images/default-profile-avatar.png';
 import { Form, Message, Title, Image } from './SignUpForm.styled';
 
 const SignUpForm = () => {
-  const [userAvatar, setUserAvatar] = useState<FileList | null>(null);
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const [_, setUserAvatar] = useState<FileList | null>(null);
   const {
     register,
     formState: { errors, isSubmitting },
@@ -44,7 +19,6 @@ const SignUpForm = () => {
   } = useForm<ISignUpCredentials>();
   const signInPageLink = `/${PagePaths.signIn}`;
   const userAvatarRef = useRef<HTMLImageElement>(null);
-  const isLoading = useAppSelector(selectIsLoading);
 
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) {
@@ -56,38 +30,13 @@ const SignUpForm = () => {
   };
 
   const onSubmit: SubmitHandler<ISignUpCredentials> = (data) => {
-    if (userAvatar) {
-      data.avatar = userAvatar;
-    }
-
-    const userData = filterEmptyFields<ISignUpCredentials>(data);
-    const userFormData = getProfileFormData(userData);
-
-    dispatch(signUpUser(userFormData))
-      .unwrap()
-      .then(() => {
-        toasts.successToast('User has been successfully registered');
-        navigate(signInPageLink);
-      })
-      .catch((error) => {
-        toasts.errorToast(error);
-      });
+    console.log(data);
   };
 
   useEffect(() => {
     errors.name && toasts.errorToast('First name is required');
-    errors.email &&
-      toasts.errorToast(
-        errors.email.type === 'required'
-          ? Messages.emailReqErr
-          : Messages.emailRegExpErr
-      );
-    errors.password &&
-      toasts.errorToast(
-        errors.password.type === 'required'
-          ? Messages.passwordReqErr
-          : Messages.passwordMinLengthErr
-      );
+    errors.email && toasts.errorToast(errors.email.type === 'required' ? Messages.emailReqErr : Messages.emailRegExpErr);
+    errors.password && toasts.errorToast(errors.password.type === 'required' ? Messages.passwordReqErr : Messages.passwordMinLengthErr);
     errors.phone && toasts.errorToast(Messages.phoneRegExpErr);
   }, [errors, isSubmitting]);
 
@@ -101,15 +50,7 @@ const SignUpForm = () => {
           accept='image/png, image/jpeg, image/jpg'
           onChange={onChangeInput}
           type={InputTypes.file}
-          altElem={
-            <Image
-              src={image}
-              alt='profile avatar'
-              width='150'
-              height='150'
-              ref={userAvatarRef}
-            />
-          }
+          altElem={<Image src={image} alt='profile avatar' width='150' height='150' ref={userAvatarRef} />}
         />
         <Input
           settings={{ ...register('name', { required: true }) }}
@@ -120,14 +61,7 @@ const SignUpForm = () => {
           inputWrap
           autoFocus
         />
-        <Input
-          settings={{ ...register('lastName') }}
-          type={InputTypes.text}
-          placeholder='Last name'
-          icon={<FaUser size={IconSizes.secondaryIconSize} />}
-          formType={FormTypes.authForm}
-          inputWrap
-        />
+        <Input settings={{ ...register('lastName') }} type={InputTypes.text} placeholder='Last name' icon={<FaUser size={IconSizes.secondaryIconSize} />} formType={FormTypes.authForm} inputWrap />
 
         <Input
           settings={{ ...register('phone', { pattern: regExp.phoneRegEx }) }}
@@ -178,12 +112,8 @@ const SignUpForm = () => {
           formType={FormTypes.authForm}
           inputWrap
         />
-        <AuthFormMessage
-          action='Sign in'
-          pageLink={signInPageLink}
-          message='if you have an account'
-        />
-        <AuthFormBtn title='Enlist' disabled={isLoading} />
+        <AuthFormMessage action='Sign in' pageLink={signInPageLink} message='if you have an account' />
+        <AuthFormBtn title='Enlist' />
       </Form>
     </>
   );
